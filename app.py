@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
-import pymysql
-from pymysql import Error
+import mysql
+from mysql.connector import Error
 
 app = Flask(__name__)
 
@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Function to connect to the MySQL database
 def connect_db():
     try:
-        connection = pymysql.connector.connect(
+        connection = mysql.connector.connect(
             host='sql12.freemysqlhosting.net',  # e.g., 'localhost'
             database='sql12731859',  # replace with your database name
             user='sql12731859',  # replace with your MySQL username
@@ -61,7 +61,6 @@ def search():
         if conn:
             cursor = conn.cursor()
             cursor.execute(query, params)
-            print(cursor.fetchall())
             results = cursor.fetchall()
             conn.close()
 
