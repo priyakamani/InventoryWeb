@@ -1,2 +1,3 @@
 mysql-connector-python~=9.0.0
 flask~=3.0.3
+gunicorn==23.0.0  # Gunicorn version (or the latest stable version)
