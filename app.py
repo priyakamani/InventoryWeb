@@ -1,12 +1,24 @@
 from flask import Flask, render_template, request
-import sqlite3
+import pymysql
+from pymysql import Error
 
 app = Flask(__name__)
 
 
-# Function to connect to the SQLite database
+# Function to connect to the MySQL database
 def connect_db():
-    return sqlite3.connect('ims.db')
+    try:
+        connection = pymysql.connector.connect(
+            host='sql12.freemysqlhosting.net',  # e.g., 'localhost'
+            database='sql12731859',  # replace with your database name
+            user='sql12731859',  # replace with your MySQL username
+            password='n8uA3aJCCQ'  # replace with your MySQL password
+        )
+        if connection.is_connected():
+            return connection
+    except Error as e:
+        print(f"Error: {e}")
+        return None
 
 
 # Route for the search page
@@ -29,16 +41,16 @@ def search():
         params = []
 
         if bale_no:
-            query += " AND BD.BALE_NO LIKE ?"
+            query += " AND BD.BALE_NO LIKE %s"
             params.append(f"%{bale_no}%")
         if item_name:
-            query += " AND ID.ITEM_NAME LIKE ?"
+            query += " AND ID.ITEM_NAME LIKE %s"
             params.append(f"%{item_name}%")
         if design:
-            query += " AND ID.DESIGN LIKE ?"
+            query += " AND ID.DESIGN LIKE %s"
             params.append(f"%{design}%")
         if color:
-            query += " AND ID.COLOR LIKE ?"
+            query += " AND ID.COLOR LIKE %s"
             params.append(f"%{color}%")
         if status_loose == 'LOOSE':
             query += " AND ID.STATUS_LOOSE = 'LOOSE'"
@@ -46,10 +58,12 @@ def search():
             query += " AND ID.STATUS_LOOSE IS NULL"
 
         conn = connect_db()
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        results = cursor.fetchall()
-        conn.close()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            print(cursor.fetchall())
+            results = cursor.fetchall()
+            conn.close()
 
     # Transform the results to replace NULL with 'PACKED'
     transformed_results = []
